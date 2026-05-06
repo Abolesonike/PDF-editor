@@ -5,9 +5,13 @@ interface ToolbarProps {
   mode: EditorMode;
   hasPdf: boolean;
   busy: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
   onFile: (file: File) => void;
   onToggleAdd: () => void;
   onExport: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
 }
 
 export function Toolbar({
@@ -15,9 +19,13 @@ export function Toolbar({
   mode,
   hasPdf,
   busy,
+  canUndo,
+  canRedo,
   onFile,
   onToggleAdd,
   onExport,
+  onUndo,
+  onRedo,
 }: ToolbarProps) {
   return (
     <div className="toolbar">
@@ -45,6 +53,12 @@ export function Toolbar({
       </button>
       <button type="button" disabled={!hasPdf || busy} onClick={onExport}>
         {busy ? '导出中…' : '导出 PDF'}
+      </button>
+      <button type="button" disabled={!canUndo} onClick={onUndo}>
+        撤销
+      </button>
+      <button type="button" disabled={!canRedo} onClick={onRedo}>
+        重做
       </button>
       <div className="spacer" />
       {fileName && <span className="file-name" title={fileName}>{fileName}</span>}

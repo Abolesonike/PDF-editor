@@ -11,6 +11,7 @@ import type { PdfDocProxy } from '../pdf/render';
 import { renderPage } from '../pdf/render';
 import { clickToPdfPoint, cssRectToPdf } from '../utils/coords';
 import { uid } from '../utils/id';
+import { DEFAULT_FONT_NAME } from '../utils/font';
 import { TextItemOverlay } from './TextItemOverlay';
 import { NewTextBox } from './NewTextBox';
 
@@ -26,6 +27,7 @@ interface PageCanvasProps {
   onAddEdit: (edit: TextEdit) => void;
   onUpdateEdit: (edit: TextEdit) => void;
   onSelectEdit: (id: string | null) => void;
+  onCommitEdit: () => void;
 }
 
 export function PageCanvas({
@@ -40,6 +42,7 @@ export function PageCanvas({
   onAddEdit,
   onUpdateEdit,
   onSelectEdit,
+  onCommitEdit,
 }: PageCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [page, setPage] = useState<PageInfo | null>(null);
@@ -88,6 +91,7 @@ export function PageCanvas({
         pdfY: pt.pdfY,
         fontSizePt: 14,
         color: { r: 0, g: 0, b: 0 },
+        fontName: DEFAULT_FONT_NAME,
       };
       onAddEdit(newEdit);
     } else {
@@ -130,6 +134,7 @@ export function PageCanvas({
       pdfY: rect.pdfY + PAD_BOTTOM / page.renderScale,
       fontSizePt: item.fontSizePt,
       color: { r: 0, g: 0, b: 0 },
+      fontName: DEFAULT_FONT_NAME,
     };
     onAddEdit(newEdit);
   };
@@ -159,6 +164,7 @@ export function PageCanvas({
               isSelected={selectedEditId === ed.id}
               isFresh={freshAddId === ed.id}
               onChange={onUpdateEdit}
+              onCommit={onCommitEdit}
               onSelect={() => onSelectEdit(ed.id)}
             />
           ))}

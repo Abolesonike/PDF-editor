@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { EditorState, PageInfo, TextEdit } from './types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { EditorState, PageInfo, TextEdit, FontManifestItem } from './types';
 import { Toolbar } from './components/Toolbar';
 import { PdfViewer } from './components/PdfViewer';
 import { EditPropertiesPanel } from './components/EditPropertiesPanel';
 import { exportPdf } from './pdf/exportPdf';
+import { fetchFontManifest, injectFontFaces } from './utils/font';
 
 export default function App() {
   const [state, setState] = useState<EditorState>({
@@ -16,12 +17,80 @@ export default function App() {
   });
   const [busy, setBusy] = useState(false);
   const [freshAddId, setFreshAddId] = useState<string | null>(null);
+  const [fontManifest, setFontManifest] = useState<FontManifestItem[]>([]);
+  const [history, setHistory] = useState<{ past: EditorState[]; future: EditorState[] }>({
+    past: [],
+    future: [],
+  });
 
   // 用 ref 跟最新 state,避免 onExport 中读到闭包旧值
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  function snapshot(s: EditorState): EditorState {
+    return {
+      ...s,
+      edits: s.edits.map((e) => ({ ...e })),
+    };
+  }
+
+  const commit = useCallback(() => {
+    setHistory((h) => ({
+      past: [...h.past, snapshot(stateRef.current)],
+      future: [],
+    }));
+  }, []);
+
+  const undo = useCallback(() => {
+    setHistory((h) => {
+      if (h.past.length === 0) return h;
+      const previous = h.past[h.past.length - 1];
+      const newPast = h.past.slice(0, -1);
+      const current = snapshot(stateRef.current);
+      setState(previous);
+      return { past: newPast, future: [current, ...h.future] };
+    });
+  }, []);
+
+  const redo = useCallback(() => {
+    setHistory((h) => {
+      if (h.future.length === 0) return h;
+      const next = h.future[0];
+      const newFuture = h.future.slice(1);
+      const current = snapshot(stateRef.current);
+      setState(next);
+      return { past: [...h.past, current], future: newFuture };
+    });
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const active = document.activeElement;
+      if (active?.getAttribute('contenteditable') === 'true') return;
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        e.shiftKey ? redo() : undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [undo, redo]);
+
+  // 加载字体清单并注入 @font-face
+  useEffect(() => {
+    fetchFontManifest()
+      .then((m) => {
+        setFontManifest(m);
+        injectFontFaces(m);
+      })
+      .catch((err) => console.error('加载字体清单失败:', err));
+  }, []);
 
   const onFile = async (file: File) => {
     const buf = await file.arrayBuffer();
@@ -37,6 +106,7 @@ export default function App() {
   };
 
   const upsertEdit = (edit: TextEdit) => {
+    commit();
     setState((s) => {
       const exists = s.edits.findIndex((e) => e.id === edit.id);
       const next = [...s.edits];
@@ -60,12 +130,17 @@ export default function App() {
   };
 
   const deleteEdit = (id: string) => {
+    commit();
     setState((s) => ({
       ...s,
       edits: s.edits.filter((e) => e.id !== id),
       selectedEditId: s.selectedEditId === id ? null : s.selectedEditId,
     }));
   };
+
+  const onCommitEdit = useCallback(() => {
+    setTimeout(() => commit(), 0);
+  }, [commit]);
 
   const selectEdit = (id: string | null) => {
     setState((s) => ({ ...s, selectedEditId: id }));
@@ -90,7 +165,7 @@ export default function App() {
     if (!s.originalBytes) return;
     setBusy(true);
     try {
-      await exportPdf(s.originalBytes, s.edits, s.fileName ?? 'document.pdf');
+      await exportPdf(s.originalBytes, s.edits, fontManifest, s.fileName ?? 'document.pdf');
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       alert(`导出失败:${msg}`);
@@ -115,9 +190,13 @@ export default function App() {
         mode={state.mode}
         hasPdf={!!state.originalBytes}
         busy={busy}
+        canUndo={history.past.length > 0}
+        canRedo={history.future.length > 0}
         onFile={onFile}
         onToggleAdd={toggleAddMode}
         onExport={onExport}
+        onUndo={undo}
+        onRedo={redo}
       />
       <PdfViewer
         bytes={state.originalBytes}
@@ -129,11 +208,14 @@ export default function App() {
         onAddEdit={upsertEdit}
         onUpdateEdit={updateEdit}
         onSelectEdit={selectEdit}
+        onCommitEdit={onCommitEdit}
       />
       {selectedEdit && (
         <EditPropertiesPanel
           edit={selectedEdit}
+          manifest={fontManifest}
           onChange={updateEdit}
+          onCommit={onCommitEdit}
           onDelete={() => deleteEdit(selectedEdit.id)}
           onClose={() => selectEdit(null)}
         />

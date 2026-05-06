@@ -15,6 +15,7 @@ interface PdfViewerProps {
   onAddEdit: (edit: TextEdit) => void;
   onUpdateEdit: (edit: TextEdit) => void;
   onSelectEdit: (id: string | null) => void;
+  onCommitEdit: () => void;
 }
 
 export function PdfViewer({
@@ -27,6 +28,7 @@ export function PdfViewer({
   onAddEdit,
   onUpdateEdit,
   onSelectEdit,
+  onCommitEdit,
 }: PdfViewerProps) {
   const [pdfDoc, setPdfDoc] = useState<PdfDocProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -98,6 +100,7 @@ export function PdfViewer({
           onAddEdit={onAddEdit}
           onUpdateEdit={onUpdateEdit}
           onSelectEdit={onSelectEdit}
+          onCommitEdit={onCommitEdit}
         />
       ))}
     </div>

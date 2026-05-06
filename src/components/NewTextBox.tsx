@@ -8,6 +8,7 @@ interface NewTextBoxProps {
   isSelected: boolean;
   isFresh: boolean;
   onChange: (edit: TextEdit) => void;
+  onCommit: () => void;
   onSelect: () => void;
 }
 
@@ -17,6 +18,7 @@ export function NewTextBox({
   isSelected,
   isFresh,
   onChange,
+  onCommit,
   onSelect,
 }: NewTextBoxProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -71,6 +73,7 @@ export function NewTextBox({
       dragRef.current = null;
       window.removeEventListener('mousemove', move);
       window.removeEventListener('mouseup', up);
+      setTimeout(() => onCommit(), 0);
     };
     window.addEventListener('mousemove', move);
     window.addEventListener('mouseup', up);
@@ -88,6 +91,7 @@ export function NewTextBox({
       onChange({ ...edit, text: newText } as TextEdit);
     }
     setEditing(false);
+    setTimeout(() => onCommit(), 0);
   };
 
   // 替换原文字时,在原 bbox 位置渲染白底覆盖原 PDF 内容
@@ -128,6 +132,7 @@ export function NewTextBox({
           fontSize: fontPx,
           lineHeight: `${fontPx}px`,
           color: `rgb(${edit.color.r * 255}, ${edit.color.g * 255}, ${edit.color.b * 255})`,
+          fontFamily: edit.fontName,
         }}
         onMouseDown={onMouseDown}
         onDoubleClick={onDoubleClick}

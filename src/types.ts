@@ -21,6 +21,11 @@ export interface PageInfo {
 
 export type RGB = { r: number; g: number; b: number };
 
+export interface FontManifestItem {
+  name: string;
+  path: string;
+}
+
 export type ReplaceEdit = {
   kind: 'replace';
   id: string;
@@ -36,6 +41,7 @@ export type ReplaceEdit = {
   pdfY: number;
   fontSizePt: number;
   color: RGB;
+  fontName: string;
 };
 
 export type AddEdit = {
@@ -47,6 +53,7 @@ export type AddEdit = {
   pdfY: number;
   fontSizePt: number;
   color: RGB;
+  fontName: string;
 };
 
 export type TextEdit = ReplaceEdit | AddEdit;

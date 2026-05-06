@@ -1,8 +1,11 @@
-import type { TextEdit, RGB } from '../types';
+import type { TextEdit, RGB, FontManifestItem } from '../types';
+import { DEFAULT_FONT_NAME } from '../utils/font';
 
 interface EditPropertiesPanelProps {
   edit: TextEdit;
+  manifest: FontManifestItem[];
   onChange: (edit: TextEdit) => void;
+  onCommit: () => void;
   onDelete: () => void;
   onClose: () => void;
 }
@@ -22,13 +25,31 @@ function hexToRgb(hex: string): RGB {
 
 export function EditPropertiesPanel({
   edit,
+  manifest,
   onChange,
+  onCommit,
   onDelete,
   onClose,
 }: EditPropertiesPanelProps) {
   return (
     <div className="props-panel">
       <h3>{edit.kind === 'add' ? '新增文字' : '替换文字'}</h3>
+      <div className="row">
+        <label>字体</label>
+        <select
+          value={edit.fontName}
+          onChange={(e) => {
+            onChange({ ...edit, fontName: e.target.value });
+            setTimeout(() => onCommit(), 0);
+          }}
+        >
+          {manifest.map((f) => (
+            <option key={f.name} value={f.name}>
+              {f.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="row">
         <label>字号 (pt)</label>
         <input
@@ -41,6 +62,7 @@ export function EditPropertiesPanel({
             const v = parseFloat(e.target.value);
             if (!Number.isFinite(v) || v <= 0) return;
             onChange({ ...edit, fontSizePt: v });
+            setTimeout(() => onCommit(), 0);
           }}
         />
       </div>
@@ -49,7 +71,10 @@ export function EditPropertiesPanel({
         <input
           type="color"
           value={rgbToHex(edit.color)}
-          onChange={(e) => onChange({ ...edit, color: hexToRgb(e.target.value) })}
+          onChange={(e) => {
+            onChange({ ...edit, color: hexToRgb(e.target.value) });
+            setTimeout(() => onCommit(), 0);
+          }}
         />
       </div>
       <button type="button" className="delete" onClick={onDelete}>

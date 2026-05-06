@@ -207,6 +207,15 @@ body,
   padding: 0;
 }
 
+.props-panel select {
+  width: 130px;
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  background: #fff;
+}
+
 .props-panel button.delete {
   width: 100%;
   padding: 6px;

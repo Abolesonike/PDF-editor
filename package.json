@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-font-manifest.js",
     "dev": "vite",
+    "prebuild": "node scripts/generate-font-manifest.js",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
