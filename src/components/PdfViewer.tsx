@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { EditorMode, PageInfo, TextEdit } from '../types';
+import type { EditorMode, FontManifestItem, PageInfo, TextEdit } from '../types';
 import { loadPdf, type PdfDocProxy } from '../pdf/render';
 import { PageCanvas } from './PageCanvas';
 
@@ -11,6 +11,7 @@ interface PdfViewerProps {
   edits: TextEdit[];
   selectedEditId: string | null;
   freshAddId: string | null;
+  fontManifest: FontManifestItem[];
   onPagesReady: (pages: PageInfo[]) => void;
   onAddEdit: (edit: TextEdit) => void;
   onUpdateEdit: (edit: TextEdit) => void;
@@ -24,6 +25,7 @@ export function PdfViewer({
   edits,
   selectedEditId,
   freshAddId,
+  fontManifest,
   onPagesReady,
   onAddEdit,
   onUpdateEdit,
@@ -94,6 +96,7 @@ export function PdfViewer({
           edits={edits}
           selectedEditId={selectedEditId}
           freshAddId={freshAddId}
+          fontManifest={fontManifest}
           onPageReady={(info) =>
             setPageInfos((prev) => ({ ...prev, [info.pageIndex]: info }))
           }

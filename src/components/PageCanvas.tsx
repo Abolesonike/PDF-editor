@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type {
   AddEdit,
   EditorMode,
+  FontManifestItem,
   OriginalTextItem,
   PageInfo,
   ReplaceEdit,
@@ -12,6 +13,7 @@ import { renderPage } from '../pdf/render';
 import { clickToPdfPoint, cssRectToPdf } from '../utils/coords';
 import { uid } from '../utils/id';
 import { DEFAULT_FONT_NAME } from '../utils/font';
+import { matchFontInManifest } from '../utils/fontMatch';
 import { TextItemOverlay } from './TextItemOverlay';
 import { NewTextBox } from './NewTextBox';
 
@@ -23,6 +25,7 @@ interface PageCanvasProps {
   edits: TextEdit[];
   selectedEditId: string | null;
   freshAddId: string | null;
+  fontManifest: FontManifestItem[];
   onPageReady: (info: PageInfo) => void;
   onAddEdit: (edit: TextEdit) => void;
   onUpdateEdit: (edit: TextEdit) => void;
@@ -38,6 +41,7 @@ export function PageCanvas({
   edits,
   selectedEditId,
   freshAddId,
+  fontManifest,
   onPageReady,
   onAddEdit,
   onUpdateEdit,
@@ -121,6 +125,7 @@ export function PageCanvas({
       },
       page
     );
+    const matchedFont = matchFontInManifest(item, fontManifest) ?? DEFAULT_FONT_NAME;
     const newEdit: ReplaceEdit = {
       kind: 'replace',
       id: item.id,
@@ -133,8 +138,8 @@ export function PageCanvas({
       pdfX: rect.pdfX + PAD_X / page.renderScale,
       pdfY: rect.pdfY + PAD_BOTTOM / page.renderScale,
       fontSizePt: item.fontSizePt,
-      color: { r: 0, g: 0, b: 0 },
-      fontName: DEFAULT_FONT_NAME,
+      color: item.color ?? { r: 0, g: 0, b: 0 },
+      fontName: matchedFont,
     };
     onAddEdit(newEdit);
   };

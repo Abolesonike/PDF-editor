@@ -7,7 +7,14 @@ export interface OriginalTextItem {
   cssWidth: number;
   cssHeight: number;
   fontSizePt: number;
+  psName?: string;
+  family?: string;
+  bold?: boolean;
+  italic?: boolean;
+  color?: RGB;
 }
+
+export type RGB = { r: number; g: number; b: number };
 
 export interface PageInfo {
   pageIndex: number;
@@ -18,8 +25,6 @@ export interface PageInfo {
   cssHeight: number;
   textItems: OriginalTextItem[];
 }
-
-export type RGB = { r: number; g: number; b: number };
 
 export interface FontManifestItem {
   name: string;

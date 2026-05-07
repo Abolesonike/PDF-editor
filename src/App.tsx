@@ -204,6 +204,7 @@ export default function App() {
         edits={state.edits}
         selectedEditId={state.selectedEditId}
         freshAddId={freshAddId}
+        fontManifest={fontManifest}
         onPagesReady={onPagesReady}
         onAddEdit={upsertEdit}
         onUpdateEdit={updateEdit}
