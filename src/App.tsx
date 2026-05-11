@@ -3,6 +3,7 @@ import type { EditorState, PageInfo, TextEdit, FontManifestItem } from './types'
 import { Toolbar } from './components/Toolbar';
 import { PdfViewer } from './components/PdfViewer';
 import { EditPropertiesPanel } from './components/EditPropertiesPanel';
+import { Footer } from './components/Footer';
 import { exportPdf } from './pdf/exportPdf';
 import { fetchFontManifest, injectFontFaces } from './utils/font';
 
@@ -221,6 +222,7 @@ export default function App() {
           onClose={() => selectEdit(null)}
         />
       )}
+      <Footer />
     </div>
   );
 }
