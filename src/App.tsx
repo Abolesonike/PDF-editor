@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import type { EditorState, PageInfo, TextEdit, FontManifestItem } from './types';
 import { Toolbar } from './components/Toolbar';
 import { PdfViewer } from './components/PdfViewer';
 import { EditPropertiesPanel } from './components/EditPropertiesPanel';
 import { Footer } from './components/Footer';
+import { CookieConsent } from './components/CookieConsent';
 import { exportPdf } from './pdf/exportPdf';
 import { fetchFontManifest, injectFontFaces } from './utils/font';
+import { Privacy } from './pages/Privacy';
+import { Terms } from './pages/Terms';
+import { About } from './pages/About';
+import { Contact } from './pages/Contact';
 
-export default function App() {
+function HomePage() {
   const [state, setState] = useState<EditorState>({
     fileName: null,
     originalBytes: null,
@@ -24,7 +30,6 @@ export default function App() {
     future: [],
   });
 
-  // 用 ref 跟最新 state,避免 onExport 中读到闭包旧值
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
@@ -83,7 +88,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [undo, redo]);
 
-  // 加载字体清单并注入 @font-face
   useEffect(() => {
     fetchFontManifest()
       .then((m) => {
@@ -115,7 +119,6 @@ export default function App() {
       else next.push(edit);
       return { ...s, edits: next, selectedEditId: edit.id };
     });
-    // 新建的 edit(无论 add 还是 replace)都让文本框首次进入编辑态
     setFreshAddId(edit.id);
     setTimeout(() => setFreshAddId(null), 100);
   };
@@ -156,11 +159,9 @@ export default function App() {
   };
 
   const onExport = async () => {
-    // 让当前正在编辑的 contenteditable 失焦,触发 onBlur 同步内容到 state
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-    // 等一帧让 React flush 所有 setState
     await new Promise<void>((r) => setTimeout(r, 0));
     const s = stateRef.current;
     if (!s.originalBytes) return;
@@ -185,7 +186,7 @@ export default function App() {
   };
 
   return (
-    <div className="app">
+    <>
       <Toolbar
         fileName={state.fileName}
         mode={state.mode}
@@ -222,6 +223,24 @@ export default function App() {
           onClose={() => selectEdit(null)}
         />
       )}
+    </>
+  );
+}
+
+export default function App() {
+  const location = useLocation();
+  const isLegalPage = location.pathname !== '/';
+
+  return (
+    <div className="app">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+      {!isLegalPage && <CookieConsent />}
       <Footer />
     </div>
   );
