@@ -11,6 +11,13 @@ export function About() {
       </section>
 
       <section>
+        <h2>关于开发</h2>
+        <p>
+          本项目<strong>完全由 Claude Code 与 Kimi Code 协作开发完成</strong>。从最初的产品构思、架构设计，到每一行代码的编写、调试与优化，均依托 AI 编程助手实现。我们相信 AI 辅助开发能够让高质量的软件工具更快地触达用户，同时也展示了现代 AI 在复杂前端项目中的实际落地能力。
+        </p>
+      </section>
+
+      <section>
         <h2>为什么选择我们</h2>
         <ul>
           <li>
