@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { EditorMode, FontManifestItem, PageInfo, TextEdit } from '../types';
 import { loadPdf, type PdfDocProxy } from '../pdf/render';
 import { PageCanvas } from './PageCanvas';
+import { LandingContent } from './LandingContent';
 
 const RENDER_SCALE = 1.5;
 
@@ -12,6 +13,7 @@ interface PdfViewerProps {
   selectedEditId: string | null;
   freshAddId: string | null;
   fontManifest: FontManifestItem[];
+  onFile: (file: File) => void;
   onPagesReady: (pages: PageInfo[]) => void;
   onAddEdit: (edit: TextEdit) => void;
   onUpdateEdit: (edit: TextEdit) => void;
@@ -26,6 +28,7 @@ export function PdfViewer({
   selectedEditId,
   freshAddId,
   fontManifest,
+  onFile,
   onPagesReady,
   onAddEdit,
   onUpdateEdit,
@@ -71,7 +74,7 @@ export function PdfViewer({
   if (!bytes) {
     return (
       <div className="viewer">
-        <div className="empty">请点击"上传 PDF"开始</div>
+        <LandingContent onFile={onFile} />
       </div>
     );
   }

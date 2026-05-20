@@ -207,6 +207,7 @@ function HomePage() {
         selectedEditId={state.selectedEditId}
         freshAddId={freshAddId}
         fontManifest={fontManifest}
+        onFile={onFile}
         onPagesReady={onPagesReady}
         onAddEdit={upsertEdit}
         onUpdateEdit={updateEdit}
