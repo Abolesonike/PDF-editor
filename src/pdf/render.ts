@@ -1,4 +1,4 @@
-import { pdfjsLib } from './pdfjsSetup';
+import { pdfjsLib, cMapUrl } from './pdfjsSetup';
 import type { PageInfo, OriginalTextItem, RGB } from '../types';
 
 export type PdfDocProxy = Awaited<ReturnType<typeof pdfjsLib.getDocument>['promise']>;
@@ -85,7 +85,13 @@ export async function loadPdf(bytes: ArrayBuffer): Promise<PdfDocProxy> {
   const copy = bytes.slice(0);
   // fontExtraProperties:true 让 worker 把真实 PostScript 名等元数据导出到 commonObjs,
   // 是字体识别功能的前置条件
-  return pdfjsLib.getDocument({ data: copy, fontExtraProperties: true }).promise;
+  // cMapUrl + cMapPacked 解决中文 CID 字体缺少字符映射的问题
+  return pdfjsLib.getDocument({
+    data: copy,
+    fontExtraProperties: true,
+    cMapUrl,
+    cMapPacked: true,
+  }).promise;
 }
 
 export interface CancellableRender {
@@ -102,6 +108,7 @@ export function renderPage(
   scale: number,
   canvas: HTMLCanvasElement
 ): CancellableRender {
+  const dpr = window.devicePixelRatio || 1;
   let cancelled = false;
   let renderTask: { cancel: () => void; promise: Promise<void> } | null = null;
 
@@ -109,9 +116,13 @@ export function renderPage(
     const page = await pdfDoc.getPage(pageIndex + 1);
     if (cancelled) return null;
 
-    const viewport = page.getViewport({ scale });
+    // 用 scale * dpr 渲染高清 canvas，但 CSS 显示尺寸保持原 scale
+    const renderScale = scale * dpr;
+    const viewport = page.getViewport({ scale: renderScale });
     canvas.width = viewport.width;
     canvas.height = viewport.height;
+    canvas.style.width = `${viewport.width / dpr}px`;
+    canvas.style.height = `${viewport.height / dpr}px`;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('无法获取 canvas 2d 上下文');
 
@@ -155,15 +166,20 @@ export function renderPage(
         const it: any = raw;
         if (typeof it.str !== 'string') return null;
         const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
-        const fontHeightPx = Math.hypot(tx[1], tx[3]) || Math.abs(tx[3]);
+        const fontHeightPxHD = Math.hypot(tx[1], tx[3]) || Math.abs(tx[3]);
         const widthPx = (it.width ?? 0) * scale;
+        const fontHeightPx = fontHeightPxHD / dpr;
         if (widthPx <= 0 || fontHeightPx <= 0) return null;
-        const cssLeft = tx[4];
-        const cssTop = tx[5] - fontHeightPx;
+        // 除以 dpr 得到 CSS 逻辑坐标，与 canvas CSS 显示尺寸匹配
+        const cssLeft = tx[4] / dpr;
+        const cssTop = (tx[5] - fontHeightPxHD) / dpr;
+        const cssWidth = widthPx;
+        const cssHeight = fontHeightPx;
         const fid = typeof it.fontName === 'string' ? it.fontName : '';
         const fontInfo = fid ? fontInfoMap.get(fid) : undefined;
+        // 颜色采样需要用高清像素坐标
         const color = imageData
-          ? sampleTextColor(imageData, cssLeft, cssTop, widthPx, fontHeightPx) ?? undefined
+          ? sampleTextColor(imageData, cssLeft * dpr, cssTop * dpr, cssWidth * dpr, cssHeight * dpr) ?? undefined
           : undefined;
         const item: OriginalTextItem = {
           id: `${pageIndex}-${idx}`,
@@ -171,8 +187,8 @@ export function renderPage(
           fontName: fid,
           cssLeft,
           cssTop,
-          cssWidth: widthPx,
-          cssHeight: fontHeightPx,
+          cssWidth,
+          cssHeight,
           fontSizePt: fontHeightPx / scale,
           ...(fontInfo ?? {}),
           color,
@@ -188,8 +204,8 @@ export function renderPage(
       renderScale: scale,
       pdfWidth: native.width,
       pdfHeight: native.height,
-      cssWidth: viewport.width,
-      cssHeight: viewport.height,
+      cssWidth: viewport.width / dpr,
+      cssHeight: viewport.height / dpr,
       textItems,
     };
   })();
