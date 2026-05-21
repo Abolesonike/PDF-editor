@@ -1,42 +1,42 @@
 [
   {
     "name": "NotoSansSC-Black",
-    "path": "/fonts/NotoSansSC-Black.ttf"
+    "path": "./fonts/NotoSansSC-Black.ttf"
   },
   {
     "name": "NotoSansSC-Bold",
-    "path": "/fonts/NotoSansSC-Bold.ttf"
+    "path": "./fonts/NotoSansSC-Bold.ttf"
   },
   {
     "name": "NotoSansSC-ExtraBold",
-    "path": "/fonts/NotoSansSC-ExtraBold.ttf"
+    "path": "./fonts/NotoSansSC-ExtraBold.ttf"
   },
   {
     "name": "NotoSansSC-ExtraLight",
-    "path": "/fonts/NotoSansSC-ExtraLight.ttf"
+    "path": "./fonts/NotoSansSC-ExtraLight.ttf"
   },
   {
     "name": "NotoSansSC-Light",
-    "path": "/fonts/NotoSansSC-Light.ttf"
+    "path": "./fonts/NotoSansSC-Light.ttf"
   },
   {
     "name": "NotoSansSC-Medium",
-    "path": "/fonts/NotoSansSC-Medium.ttf"
+    "path": "./fonts/NotoSansSC-Medium.ttf"
   },
   {
     "name": "NotoSansSC-Regular",
-    "path": "/fonts/NotoSansSC-Regular.ttf"
+    "path": "./fonts/NotoSansSC-Regular.ttf"
   },
   {
     "name": "NotoSansSC-SemiBold",
-    "path": "/fonts/NotoSansSC-SemiBold.ttf"
+    "path": "./fonts/NotoSansSC-SemiBold.ttf"
   },
   {
     "name": "NotoSansSC-Thin",
-    "path": "/fonts/NotoSansSC-Thin.ttf"
+    "path": "./fonts/NotoSansSC-Thin.ttf"
   },
   {
     "name": "NotoSansSC-VariableFont_wght",
-    "path": "/fonts/NotoSansSC-VariableFont_wght.ttf"
+    "path": "./fonts/NotoSansSC-VariableFont_wght.ttf"
   }
 ]

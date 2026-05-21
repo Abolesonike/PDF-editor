@@ -21,7 +21,7 @@ function scan(dir, urlBase) {
   }
 }
 
-scan(fontsDir, '/fonts');
+scan(fontsDir, './fonts');
 
 // 按名称去重，保留第一个遇到的
 const seen = new Set();

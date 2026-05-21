@@ -29,7 +29,7 @@ export async function loadFontBytes(path: string): Promise<ArrayBuffer> {
 
 // 获取字体清单
 export async function fetchFontManifest(): Promise<FontManifestItem[]> {
-  const res = await fetch('/fonts/fonts.json');
+  const res = await fetch('./fonts/fonts.json');
   if (!res.ok) throw new Error('字体清单加载失败');
   return res.json();
 }
@@ -71,10 +71,10 @@ export function injectFontFaces(manifest: FontManifestItem[]) {
 
 // 兼容性保留：原有单字体加载（内部走 loadFontBytes）
 const FONT_CANDIDATES = [
-  '/fonts/static/NotoSansSC-Regular.ttf',
-  '/fonts/NotoSansSC-Regular.ttf',
-  '/fonts/NotoSansSC-Regular.otf',
-  '/fonts/NotoSansSC-VariableFont_wght.ttf',
+  './fonts/static/NotoSansSC-Regular.ttf',
+  './fonts/NotoSansSC-Regular.ttf',
+  './fonts/NotoSansSC-Regular.otf',
+  './fonts/NotoSansSC-VariableFont_wght.ttf',
 ];
 
 export async function loadChineseFontBytes(): Promise<ArrayBuffer> {
