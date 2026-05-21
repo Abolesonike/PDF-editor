@@ -1,19 +1,7 @@
 [
   {
-    "name": "NotoSansSC-Black",
-    "path": "./fonts/NotoSansSC-Black.ttf"
-  },
-  {
     "name": "NotoSansSC-Bold",
     "path": "./fonts/NotoSansSC-Bold.ttf"
-  },
-  {
-    "name": "NotoSansSC-ExtraBold",
-    "path": "./fonts/NotoSansSC-ExtraBold.ttf"
-  },
-  {
-    "name": "NotoSansSC-ExtraLight",
-    "path": "./fonts/NotoSansSC-ExtraLight.ttf"
   },
   {
     "name": "NotoSansSC-Light",
@@ -28,15 +16,23 @@
     "path": "./fonts/NotoSansSC-Regular.ttf"
   },
   {
-    "name": "NotoSansSC-SemiBold",
-    "path": "./fonts/NotoSansSC-SemiBold.ttf"
-  },
-  {
     "name": "NotoSansSC-Thin",
     "path": "./fonts/NotoSansSC-Thin.ttf"
   },
   {
-    "name": "NotoSansSC-VariableFont_wght",
-    "path": "./fonts/NotoSansSC-VariableFont_wght.ttf"
+    "name": "SourceHanSerifCN-Bold",
+    "path": "./fonts/SourceHanSerifCN-Bold.otf"
+  },
+  {
+    "name": "SourceHanSerifCN-Light",
+    "path": "./fonts/SourceHanSerifCN-Light.otf"
+  },
+  {
+    "name": "SourceHanSerifCN-Medium",
+    "path": "./fonts/SourceHanSerifCN-Medium.otf"
+  },
+  {
+    "name": "SourceHanSerifCN-Regular",
+    "path": "./fonts/SourceHanSerifCN-Regular.otf"
   }
 ]
